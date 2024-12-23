@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  streamvault:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: streamvault:latest
+    container_name: streamvault
+    environment:
+      - API_HOST=0.0.0.0
+    ports:
+      - "9001:9000"
+    volumes:
+      - streamvault_storage:/app/storage
+      - streamvault_backup:/app/backup
+    restart: unless-stopped
+
+volumes:
+  streamvault_storage:
+  streamvault_backup:
