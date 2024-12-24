@@ -2,6 +2,7 @@ package me.proo0xy.api;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import me.proo0xy.api.models.ResponseStatus;
 import me.proo0xy.api.models.WebSocketActionMessage;
 import me.proo0xy.api.models.crud.VaultPutMessage;
 import me.proo0xy.data.DataEntry;
@@ -245,45 +246,29 @@ public class WebSocketController extends WebSocketServer {
     }
 
     /**
-     * Sends a JSON-formatted error message to the specified client.
-     *
-     * @param conn  The WebSocket connection.
-     * @param error The error message.
-     */
-    private void sendError(WebSocket conn, String error) {
-        JsonObject errorMessage = new JsonObject();
-        errorMessage.addProperty("status", "error");
-        errorMessage.addProperty("message", error);
-        conn.send(gson.toJson(errorMessage));
-        log.warn("Sent error to client {}: {}", conn.getRemoteSocketAddress(), error);
-    }
-
-    /**
-     * Sends a JSON-formatted success message to the specified client.
+     * Sends a JSON-formatted message to the specified client.
      *
      * @param conn    The WebSocket connection.
-     * @param message The success message.
+     * @param message The message.
      */
+    private void sendMessage(WebSocket conn, ResponseStatus status, String message) {
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("status", status.name());
+        jsonObject.addProperty("message", message);
+        conn.send(gson.toJson(jsonObject));
+        log.info("Sent {} message to client {}: {}", status.name(), conn.getRemoteSocketAddress(), message);
+    }
+
     private void sendSuccess(WebSocket conn, String message) {
-        JsonObject successMessage = new JsonObject();
-        successMessage.addProperty("status", "success");
-        successMessage.addProperty("message", message);
-        conn.send(gson.toJson(successMessage));
-        log.info("Sent success message to client {}: {}", conn.getRemoteSocketAddress(), message);
+        sendMessage(conn, ResponseStatus.SUCCESS, message);
     }
 
-    /**
-     * Sends a JSON-formatted success message to the specified client.
-     *
-     * @param conn    The WebSocket connection.
-     * @param message The success message.
-     */
+    private void sendError(WebSocket conn, String message) {
+        sendMessage(conn, ResponseStatus.ERROR, message);
+    }
+
     private void sendUpdate(WebSocket conn, String message) {
-        JsonObject successMessage = new JsonObject();
-        successMessage.addProperty("status", "update");
-        successMessage.addProperty("message", message);
-        conn.send(gson.toJson(successMessage));
-        log.info("Sent update message to client {}: {}", conn.getRemoteSocketAddress(), message);
+        sendMessage(conn, ResponseStatus.UPDATE, message);
     }
 
     /**
