@@ -2,10 +2,7 @@ version: '3.8'
 
 services:
   streamvault:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    image: streamvault:latest
+    image: ghcr.io/prooxyyy/streamvault:latest
     container_name: streamvault
     environment:
       - API_HOST=0.0.0.0

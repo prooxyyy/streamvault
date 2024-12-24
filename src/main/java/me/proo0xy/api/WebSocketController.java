@@ -239,8 +239,7 @@ public class WebSocketController extends WebSocketServer {
         Set<WebSocket> subscribersSet = subscriptions.get(key);
         if (subscribersSet != null) {
             for (WebSocket client : subscribersSet) {
-                client.send(message);
-                log.info("Sent update for key '{}' to client: {}", key, client.getRemoteSocketAddress());
+                sendUpdate(client, message);
             }
         }
     }
@@ -271,6 +270,20 @@ public class WebSocketController extends WebSocketServer {
         successMessage.addProperty("message", message);
         conn.send(gson.toJson(successMessage));
         log.info("Sent success message to client {}: {}", conn.getRemoteSocketAddress(), message);
+    }
+
+    /**
+     * Sends a JSON-formatted success message to the specified client.
+     *
+     * @param conn    The WebSocket connection.
+     * @param message The success message.
+     */
+    private void sendUpdate(WebSocket conn, String message) {
+        JsonObject successMessage = new JsonObject();
+        successMessage.addProperty("status", "update");
+        successMessage.addProperty("message", message);
+        conn.send(gson.toJson(successMessage));
+        log.info("Sent update message to client {}: {}", conn.getRemoteSocketAddress(), message);
     }
 
     /**
